@@ -1,0 +1,328 @@
+body {
+    background-color: #eeeeee;
+}
+
+.chess {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 400px;
+    border: 4px solid black;
+    box-sizing: border-box;
+    border-radius: 20px;
+}
+
+.chess-white {
+    background-color: #ffffff;
+    color: black;
+}
+
+.chess-black {
+    background-color: #404040;
+    color: white;
+}
+
+.chess .chess-info {
+    padding: 5px;
+    box-sizing: border-box;
+    font-size: 24px;
+    display: flex;
+    width: 100%;
+}
+
+.chess .chess-info .chess-text {
+    margin: 0px 0px;
+    flex-grow: 1;
+    text-align: center;
+}
+
+.chess .chess-info .chess-rotate-board {
+    width: 30px;
+    height: 30px;
+    background-color: #777777;
+    background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0.05), rgba(0, 0, 0, 0.05));
+    border-radius: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: all 0.15s ease-in-out;
+    cursor: pointer;
+}
+
+.chess .chess-info .chess-rotate-board:hover {
+    background-color: #636363;
+}
+
+.chess .chess-info .chess-rotate-board:active {
+    background-color: #505050;
+}
+
+.chess .chess-info .chess-rotate-board img {
+    width: 70%;
+    height: 70%;
+}
+
+.chess.chess-white .chess-on-black {
+    display: none;
+}
+
+.chess.chess-black .chess-on-white {
+    display: none;
+}
+
+.chess-board {
+    position: relative;
+    margin-top: -5px;
+    top: 5px;
+    width: 400px;
+    height: 400px;
+    border: 4px solid black;
+    box-sizing: border-box;
+    border-radius: 20px;
+    background-color: #000000;
+}
+
+.chess-board.chess-board-rotated {
+    rotate:180deg;
+}
+
+.chess-board .chess-board-squares {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    grid-template-rows: repeat(8, 1fr);
+    z-index: 1;
+}
+
+.chess-board .chess-board-squares .chess-board-square {
+    background-color: #b88b4a;
+    background-image: linear-gradient(to bottom right, rgba(255, 255, 255, 0.05), rgba(0, 0, 0, 0.05));
+    width: 100%;
+    height: 100%;
+    transition: 0.3s all ease-in-out;
+}
+
+.chess-board.chess-board-rotated .chess-board-squares .chess-board-square {
+    background-image: linear-gradient(to top left, rgba(255, 255, 255, 0.05), rgba(0, 0, 0, 0.05));
+}
+
+.chess-board .chess-board-squares .chess-board-square.chess-board-square-last {
+    background-color: #eebb30;
+}
+
+.chess-board .chess-board-squares .chess-board-square.chess-board-square-droppable {
+    background-color: #33cf7b;
+    transition: 0.1s all ease-in-out;
+}
+
+.chess-board .chess-board-squares .chess-board-square:nth-child(16n+1),
+.chess-board .chess-board-squares .chess-board-square:nth-child(16n+3),
+.chess-board .chess-board-squares .chess-board-square:nth-child(16n+5),
+.chess-board .chess-board-squares .chess-board-square:nth-child(16n+7),
+.chess-board .chess-board-squares .chess-board-square:nth-child(16n+10),
+.chess-board .chess-board-squares .chess-board-square:nth-child(16n+12),
+.chess-board .chess-board-squares .chess-board-square:nth-child(16n+14),
+.chess-board .chess-board-squares .chess-board-square:nth-child(16n+16) {
+    background-color: #e3c16f;
+}
+
+.chess-board .chess-board-squares .chess-board-square:nth-child(16n+1).chess-board-square-last,
+.chess-board .chess-board-squares .chess-board-square:nth-child(16n+3).chess-board-square-last,
+.chess-board .chess-board-squares .chess-board-square:nth-child(16n+5).chess-board-square-last,
+.chess-board .chess-board-squares .chess-board-square:nth-child(16n+7).chess-board-square-last,
+.chess-board .chess-board-squares .chess-board-square:nth-child(16n+10).chess-board-square-last,
+.chess-board .chess-board-squares .chess-board-square:nth-child(16n+12).chess-board-square-last,
+.chess-board .chess-board-squares .chess-board-square:nth-child(16n+14).chess-board-square-last,
+.chess-board .chess-board-squares .chess-board-square:nth-child(16n+16).chess-board-square-last {
+    background-color: #ffcc33;
+}
+
+.chess-board .chess-board-squares .chess-board-square:nth-child(16n+1).chess-board-square-droppable,
+.chess-board .chess-board-squares .chess-board-square:nth-child(16n+3).chess-board-square-droppable,
+.chess-board .chess-board-squares .chess-board-square:nth-child(16n+5).chess-board-square-droppable,
+.chess-board .chess-board-squares .chess-board-square:nth-child(16n+7).chess-board-square-droppable,
+.chess-board .chess-board-squares .chess-board-square:nth-child(16n+10).chess-board-square-droppable,
+.chess-board .chess-board-squares .chess-board-square:nth-child(16n+12).chess-board-square-droppable,
+.chess-board .chess-board-squares .chess-board-square:nth-child(16n+14).chess-board-square-droppable,
+.chess-board .chess-board-squares .chess-board-square:nth-child(16n+16).chess-board-square-droppable {
+    background-color: #33e89a;
+}
+
+.chess-board .chess-board-squares .chess-board-square:nth-child(1) {
+    border-top-left-radius: 30%;
+}
+
+.chess-board .chess-board-squares .chess-board-square:nth-child(8) {
+    border-top-right-radius: 30%;
+}
+
+.chess-board .chess-board-squares .chess-board-square:nth-child(57) {
+    border-bottom-left-radius: 30%;
+}
+
+.chess-board .chess-board-squares .chess-board-square:nth-child(64) {
+    border-bottom-right-radius: 30%;
+}
+
+.chess-board .chess-board-pieces {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    z-index: 2;
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    grid-template-rows: repeat(8, 1fr);
+    pointer-events: none;
+}
+
+.chess-board .chess-board-piece {
+    width: 100%;
+    height: 100%;
+    background-size: 100%;
+    border-radius: 50%;
+    grid-row: 1;
+    grid-column: 1;
+    cursor: pointer;
+    pointer-events: all;
+    transition: 0.3s all ease-in-out;
+}
+
+.chess-board.chess-board-rotated .chess-board-pieces {
+    rotate:-180deg;
+}
+
+.chess-board .chess-board-piece.chess-board-piece-taken {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.chess-board .chess-board-piece.chess-board-piece-selected {
+    box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.25);
+    background-color: rgba(0, 0, 0, 0.25);
+    transition: 0.1s all ease-in-out, 0s top linear, 0s left linear;
+}
+
+.chess-board .chess-board-pieces .chess-board-piece:nth-child(1),
+.chess-board .chess-board-pieces .chess-board-piece:nth-child(8),
+.chess-board .chess-board-pieces .chess-board-piece.chess-promoted-black-rook,
+.chess-board .chess-board-promotion.chess-black-promotion .chess-board-promotion-rook {
+    background-image: url("../img/pieces/Chess_rdt60.png") !important;
+}
+
+.chess-board .chess-board-pieces .chess-board-piece:nth-child(2),
+.chess-board .chess-board-pieces .chess-board-piece:nth-child(7),
+.chess-board .chess-board-pieces .chess-board-piece.chess-promoted-black-knight,
+.chess-board .chess-board-promotion.chess-black-promotion .chess-board-promotion-knight {
+    background-image: url("../img/pieces/Chess_ndt60.png") !important;
+}
+
+.chess-board .chess-board-pieces .chess-board-piece:nth-child(3),
+.chess-board .chess-board-pieces .chess-board-piece:nth-child(6),
+.chess-board .chess-board-pieces .chess-board-piece.chess-promoted-black-bishop,
+.chess-board .chess-board-promotion.chess-black-promotion .chess-board-promotion-bishop {
+    background-image: url("../img/pieces/Chess_bdt60.png") !important;
+}
+
+.chess-board .chess-board-pieces .chess-board-piece:nth-child(4),
+.chess-board .chess-board-pieces .chess-board-piece.chess-promoted-black-queen,
+.chess-board .chess-board-promotion.chess-black-promotion .chess-board-promotion-queen {
+    background-image: url("../img/pieces/Chess_qdt60.png") !important;
+}
+
+.chess-board .chess-board-pieces .chess-board-piece:nth-child(5) {
+    background-image: url("../img/pieces/Chess_kdt60.png");
+}
+
+.chess-board .chess-board-pieces .chess-board-piece:nth-child(n+9):nth-child(-n+16) {
+    background-image: url("../img/pieces/Chess_pdt60.png");
+}
+
+.chess-board .chess-board-pieces .chess-board-piece:nth-child(25),
+.chess-board .chess-board-pieces .chess-board-piece:nth-child(32),
+.chess-board .chess-board-pieces .chess-board-piece.chess-promoted-white-rook,
+.chess-board .chess-board-promotion.chess-white-promotion .chess-board-promotion-rook {
+    background-image: url("../img/pieces/Chess_rlt60.png") !important;
+}
+
+.chess-board .chess-board-pieces .chess-board-piece:nth-child(26),
+.chess-board .chess-board-pieces .chess-board-piece:nth-child(31),
+.chess-board .chess-board-pieces .chess-board-piece.chess-promoted-white-knight,
+.chess-board .chess-board-promotion.chess-white-promotion .chess-board-promotion-knight {
+    background-image: url("../img/pieces/Chess_nlt60.png") !important;
+}
+
+.chess-board .chess-board-pieces .chess-board-piece:nth-child(27),
+.chess-board .chess-board-pieces .chess-board-piece:nth-child(30),
+.chess-board .chess-board-pieces .chess-board-piece.chess-promoted-white-bishop,
+.chess-board .chess-board-promotion.chess-white-promotion .chess-board-promotion-bishop {
+    background-image: url("../img/pieces/Chess_blt60.png") !important;
+}
+
+.chess-board .chess-board-pieces .chess-board-piece:nth-child(28),
+.chess-board .chess-board-pieces .chess-board-piece.chess-promoted-white-queen,
+.chess-board .chess-board-promotion.chess-white-promotion .chess-board-promotion-queen {
+    background-image: url("../img/pieces/Chess_qlt60.png") !important;
+}
+
+.chess-board .chess-board-pieces .chess-board-piece:nth-child(29) {
+    background-image: url("../img/pieces/Chess_klt60.png");
+}
+
+.chess-board .chess-board-pieces .chess-board-piece:nth-child(n+17):nth-child(-n+24) {
+    background-image: url("../img/pieces/Chess_plt60.png");
+}
+
+.chess-board .chess-board-promotion {
+    position: absolute;
+    width: 49px;
+    height: 245px;
+    border-radius: 15px;
+    background-color: white;
+    z-index: 3;
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 4px 4px 8px 0px rgba(0, 0, 0, 0.2);
+}
+
+.chess-board .chess-board-promotion.chess-on-promotion {
+    display: flex;
+}
+
+.chess-board .chess-board-promotion.chess-black-promotion {
+    bottom: 0;
+    transform: scaleY(-100%);
+}
+
+.chess-board .chess-board-promotion div {
+    width: 100%;
+    height: 100%;
+    background-size: 100%;
+    cursor: pointer;
+}
+
+.chess-board .chess-board-promotion.chess-black-promotion div {
+    transform: scaleY(-100%);
+}
+
+.chess-board.chess-board-rotated .chess-board-promotion.chess-white-promotion div:not(:last-child) {
+    transform: rotate(180deg);
+}
+
+.chess-board.chess-board-rotated .chess-board-promotion.chess-black-promotion div:not(:last-child) {
+    transform: scaleY(-100%) rotate(180deg);
+}
+
+.chess-board .chess-board-promotion div:last-child {
+    background-color: #e0e0e0;
+    border-radius: 0px 0px 15px 15px;
+    background-image: url("../img/cross.png");
+}
+
+.chess-board .chess-board-promotion.chess-black-promotion div:last-child {
+    transform: none;
+}
