@@ -205,6 +205,16 @@ body {
     transition: 0.1s all ease-in-out, 0s top linear, 0s left linear;
 }
 
+.chess-board .chess-board-piece.chess-board-piece-checked {
+    box-shadow: 0px 0px 10px 0px rgba(255, 0, 0, 0.75);
+    background-color: rgba(255, 0, 0, 0.75);
+}
+
+.chess-board .chess-board-piece.chess-board-piece-checked.chess-board-piece-selected {
+    box-shadow: 0px 0px 10px 0px rgba(128, 0, 0, 0.75);
+    background-color: rgba(128, 0, 0, 0.75);
+}
+
 .chess-board .chess-board-pieces .chess-board-piece:nth-child(1),
 .chess-board .chess-board-pieces .chess-board-piece:nth-child(8),
 .chess-board .chess-board-pieces .chess-board-piece.chess-promoted-black-rook,

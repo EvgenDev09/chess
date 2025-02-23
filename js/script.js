@@ -23,7 +23,7 @@ let currentPosition = startPosition;
 function showPossibleMoves(piece) {
 	hidePossibleMoves(curPiece);
 	let index = piece.index();
-	let possibleMoves = getPossiblePieceMoves(currentPosition, piecesData[index][0], piecesData[index][1]);
+	let possibleMoves = getLegalPieceMoves(currentPosition, piecesData[index][0], piecesData[index][1]);
 	possibleMoves.forEach(element => {
 		$(".chess-board-square").eq(element[0]*8 + element[1]).addClass("chess-board-square-droppable");
 	});
@@ -135,6 +135,16 @@ function moveElementTo(obj, x, y, promoteTo=-1) {
 	if (index == 7 || index == 4) currentPosition.shortCastleBlack = false;
 	if (index == 24 || index == 28) currentPosition.longCastleWhite = false;
 	if (index == 31 || index == 28) currentPosition.shortCastleWhite = false;
+	$(".chess-board-piece-checked").removeClass("chess-board-piece-checked");
+	if (currentPosition.move == 0) {
+		if (isKingChecked(currentPosition, true)) {
+			$(".chess-board-piece.chess-board-piece:nth-child(29)").addClass("chess-board-piece-checked");
+		}
+	} else {
+		if (isKingChecked(currentPosition, false)) {
+			$(".chess-board-piece.chess-board-piece:nth-child(5)").addClass("chess-board-piece-checked");
+		}
+	}
 }
 
 function removePiece(x, y) {
@@ -178,6 +188,154 @@ let boardData = [
 	[16, 17, 18, 19, 20, 21, 22, 23],
 	[24, 25, 26, 27, 28, 29, 30, 31]
 ];
+
+function isKingChecked(position, isWhite) {
+	let toReturn = false;
+	for (let i=0; i<8; i++) {
+		for (let j=0; j<8; j++) {
+			if (position.board[i][j] == 0 || ((position.board[i][j] > 0) == isWhite)) continue;
+			switch (Math.abs(position.board[i][j])) {
+				case 1:
+					if (!isWhite) {
+						if (i != 0) {
+							if (j != 0) {
+								if (position.board[i-1][j-1] == -6)
+									toReturn = true;
+							}
+							if (j != 7) {
+								if (position.board[i-1][j+1] == -6)
+									toReturn = true;
+							}
+						}
+					} else {
+						if (i != 7) {
+							if (j != 0) {
+								if (position.board[i+1][j-1] == 6)
+									toReturn = true;
+							}
+							if (j != 7) {
+								if (position.board[i+1][j+1] == 6)
+									toReturn = true;
+							}
+						}
+					}
+					break;
+				case 2:
+					possible = [[-2, -1], [-2, 1], [-1, -2], [-1, 2], [1, -2], [1, 2], [2, -1], [2, 1]];
+					possible.forEach(element => {
+						let newI = i+element[0], newJ = j+element[1];
+						if (newI >= 0)
+						if (newI < 8)
+						if (newJ >= 0)
+						if (newJ < 8)
+						if ((isWhite && position.board[newI][newJ] == 6) || (!isWhite && position.board[newI][newJ] == -6))
+						toReturn = true;
+					});
+					break;
+				case 3:
+					possible = [[-1, -1], [-1, 1], [1, -1], [1, 1]];
+					possible.forEach(element => {
+						let newI = i, newJ = j;
+						while (true) {
+							newI += element[0];
+							newJ += element[1];
+							if (newI < 0) break;
+							if (newI >= 8) break;
+							if (newJ < 0) break;
+							if (newJ >= 8) break;
+							if (position.board[newI][newJ] != 0) {
+								if ((isWhite && position.board[newI][newJ] == 6) || (!isWhite && position.board[newI][newJ] == -6)) {
+									toReturn = true;
+								}
+								break;
+							}
+						}
+					});
+					break;
+				case 4:
+					possible = [[-1, 0], [1, 0], [0, -1], [0, 1]];
+					possible.forEach(element => {
+						let newI = i, newJ = j;
+						while (true) {
+							newI += element[0];
+							newJ += element[1];
+							if (newI < 0) break;
+							if (newI >= 8) break;
+							if (newJ < 0) break;
+							if (newJ >= 8) break;
+							if (position.board[newI][newJ] != 0) {
+								if ((isWhite && position.board[newI][newJ] == 6) || (!isWhite && position.board[newI][newJ] == -6)) {
+									toReturn = true;
+								}
+								break;
+							}
+						}
+					});
+					break;
+				case 5:
+					possible = [[-1, -1], [-1, 1], [1, -1], [1, 1], [-1, 0], [1, 0], [0, -1], [0, 1]];
+					possible.forEach(element => {
+						let newI = i, newJ = j;
+						while (true) {
+							newI += element[0];
+							newJ += element[1];
+							if (newI < 0) break;
+							if (newI >= 8) break;
+							if (newJ < 0) break;
+							if (newJ >= 8) break;
+							if (position.board[newI][newJ] != 0) {
+								if ((isWhite && position.board[newI][newJ] == 6) || (!isWhite && position.board[newI][newJ] == -6)) {
+									toReturn = true;
+								}
+								break;
+							}
+						}
+					});
+					break;
+				case 6:
+					for (let di=-1; di<=1; di++) {
+						for (let dj=-1; dj<=1; dj++) {
+							if (di == 0 && dj == 0) continue;
+							let newI = i + di, newJ = j + dj;
+							if (newI < 0) continue;
+							if (newI >= 8) continue;
+							if (newJ < 0) continue;
+							if (newJ >= 8) continue;
+							if ((isWhite && position.board[newI][newJ] == 6) || (!isWhite && position.board[newI][newJ] == -6)) toReturn = true;
+						}
+					}
+					break;
+			}
+		}
+	}
+	return toReturn;
+}
+
+function getLegalPieceMoves(position, i, j) {
+	let moves = getPossiblePieceMoves(position, i, j);
+	let legalMoves = [];
+	moves.forEach(move => {
+		let isLegal = true;
+		let thatPiece = position.board[move[0]][move[1]];
+		position.board[move[0]][move[1]] = position.board[i][j];
+		position.board[i][j] = 0;
+		if (isKingChecked(position, position.move == 0)) isLegal = false;
+		position.board[i][j] = position.board[move[0]][move[1]];
+		position.board[move[0]][move[1]] = thatPiece;
+		if (isLegal && Math.abs(position.board[i][j]) == 6 && Math.abs(j-move[1]) > 1) {
+			if (isKingChecked(position, position.move == 0)) isLegal = false;
+			else {
+				position.board[move[0]][j+Math.round((move[1]-j)/2)] = position.board[i][j];
+				position.board[i][j] = 0;
+				if (isKingChecked(position, position.move == 0)) isLegal = false;
+				position.board[i][j] = position.board[move[0]][j+Math.round((move[1]-j)/2)];
+				position.board[move[0]][j+Math.round((move[1]-j)/2)] = 0;
+			}
+		}
+		if (isLegal) legalMoves.push(move);
+	});
+	return legalMoves;
+}
 
 function getPossiblePieceMoves(position, i, j) {
 	let moves = [];
