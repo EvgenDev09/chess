@@ -23,6 +23,11 @@ body {
     color: white;
 }
 
+.chess-gray {
+    background-color: #888888;
+    color: white;
+}
+
 .chess .chess-info {
     padding: 5px;
     box-sizing: border-box;

@@ -56,6 +56,7 @@ let currentPromotion = {
 	piece: -1,
 	active: false
 }
+let hasGameEnded = false;
 
 function moveElementTo(obj, x, y, promoteTo=-1) {
 	let index = obj.index();
@@ -119,14 +120,6 @@ function moveElementTo(obj, x, y, promoteTo=-1) {
 		currentPosition.enPassant = piecesData[index][1];
 	}
 	setPiecePosition(obj, x, y);
-	if (isWhiteMove()) {
-		chess.removeClass("chess-white");
-		chess.addClass("chess-black");
-	} else {
-		chess.addClass("chess-white");
-		chess.removeClass("chess-black");
-	}
-	currentPosition.move = (currentPosition.move + 1) % 2;
 	if (currentPosition.longCastleBlack && index == 4 && x == 2) setPiecePosition($(".chess-board-piece").eq(0), 3, 0);
 	if (currentPosition.shortCastleBlack && index == 4 && x == 6) setPiecePosition($(".chess-board-piece").eq(7), 5, 0);
 	if (currentPosition.longCastleWhite && index == 28 && x == 2) setPiecePosition($(".chess-board-piece").eq(24), 3, 7);
@@ -135,6 +128,7 @@ function moveElementTo(obj, x, y, promoteTo=-1) {
 	if (index == 7 || index == 4) currentPosition.shortCastleBlack = false;
 	if (index == 24 || index == 28) currentPosition.longCastleWhite = false;
 	if (index == 31 || index == 28) currentPosition.shortCastleWhite = false;
+	currentPosition.move = (currentPosition.move + 1) % 2;
 	$(".chess-board-piece-checked").removeClass("chess-board-piece-checked");
 	if (currentPosition.move == 0) {
 		if (isKingChecked(currentPosition, true)) {
@@ -143,6 +137,23 @@ function moveElementTo(obj, x, y, promoteTo=-1) {
 	} else {
 		if (isKingChecked(currentPosition, false)) {
 			$(".chess-board-piece.chess-board-piece:nth-child(5)").addClass("chess-board-piece-checked");
+		}
+	}
+	if (getAllLegalMoves(currentPosition, (currentPosition.move == 0)).length == 0) {
+		if (isKingChecked(currentPosition, (currentPosition.move == 0))) {
+			$(".chess-text").text(`Checkmate! ${(currentPosition.move != 0) ? "White" : "Black"} Won`);
+		} else {
+			$(".chess-text").text("Stalemate! Draw");
+			$(".chess").addClass("chess-gray");
+		}
+		hasGameEnded = true;
+	} else {
+		if (isWhiteMove()) {
+			chess.removeClass("chess-white");
+			chess.addClass("chess-black");
+		} else {
+			chess.addClass("chess-white");
+			chess.removeClass("chess-black");
 		}
 	}
 }
@@ -309,6 +320,20 @@ function isKingChecked(position, isWhite) {
 		}
 	}
 	return toReturn;
+}
+
+function getAllLegalMoves(position, isWhite) {
+	let allMoves = [];
+	for (let i=0; i<8; i++) {
+		for (let j=0; j<8; j++) {
+			if (position.board[i][j] == 0 || ((position.board[i][j] > 0) != isWhite)) continue;
+			moves = getLegalPieceMoves(position, i, j);
+			moves.forEach(move => {
+				allMoves.push(move);
+			});
+		}
+	}
+	return allMoves;
 }
 
 function getLegalPieceMoves(position, i, j) {
@@ -573,6 +598,7 @@ let piecesData = [
 
 $(document).ready(function(){
 	$(".chess-board-piece").each(function(index) {
+		$(this).attr("draggable", false);
 		if (isElementWhite($(this)))
 			setPiecePosition($(this), index%8, Math.floor(index/8) + 4);
 		else
@@ -617,7 +643,7 @@ $(".chess-rotate-board").click(function(event) {
 	}
 });
 $(".chess-board-piece").click(function(event) {
-	if (currentPromotion.active) return;
+	if (currentPromotion.active || hasGameEnded) return;
 	if (isElementWhite($(this)) == isWhiteMove()) {
 		if (curPiece != null && curPiece.index() == $(this).index()) {
 			hidePossibleMoves(curPiece);
@@ -639,7 +665,7 @@ $(".chess-board-square").droppable({
 	scope: "chess"
 });
 $(".chess-board-square").click(function(event) {
-	if (currentPromotion.active) return;
+	if (currentPromotion.active || hasGameEnded) return;
 	if (!curPiece) return;
 	if (!$(this).hasClass("chess-board-square-droppable")) {
 		hidePossibleMoves(curPiece);
