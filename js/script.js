@@ -18,6 +18,7 @@ let startPosition = {
 	enPassant: -1,
 };
 
+let scale = 1;
 let currentPosition = startPosition;
 
 function showPossibleMoves(piece) {
@@ -44,8 +45,8 @@ function isWhiteMove() {
 	return chess.hasClass("chess-white");
 }
 
-let squareWidth = $(".chess-board-square:first-child").css("width");
 let curPiece = null;
+let squareWidth = "40px";
 let chess = $(".chess");
 let chessBoard = $(".chess-board");
 let boardPieces = $(".chess-board-pieces .chess-board-piece");
@@ -597,8 +598,13 @@ let piecesData = [
 }*/
 
 $(document).ready(function(){
+	scale = ($(".chess").width() + 8) / 400;
+	$(".chess-info").css({"font-size": `calc(24px * ${scale})`});
+	$(".chess-rotate-board").css({"width": `calc(30px * ${scale})`, "height": `calc(30px * ${scale})`});
+	$(".chess-board").css({"width": `calc(400px * ${scale})`, "height": `calc(400px * ${scale})`});
+	squareWidth = $(".chess-board-square:first-child").css("width");
+	$(".chess-board-promotion").css({"width": squareWidth, "height": `calc(${squareWidth}*5)`});
 	$(".chess-board-piece").each(function(index) {
-		$(this).attr("draggable", false);
 		if (isElementWhite($(this)))
 			setPiecePosition($(this), index%8, Math.floor(index/8) + 4);
 		else
