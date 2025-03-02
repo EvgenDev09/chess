@@ -15,11 +15,14 @@ let startPosition = {
 	shortCastleBlack: true,
 	longCastleBlack: true,
 	moves50: 0,
-	enPassant: -1,
+	positionsBefore: {},
+	enPassant: -1
 };
 
 let scale = 1;
-let currentPosition = startPosition;
+let pieceStr = "KQRBNP.pnbrqk";
+startPosition.positionsBefore[shortPosString(startPosition)] = 1;
+let currentPosition = copyPosition(startPosition);
 
 function showPossibleMoves(piece) {
 	hidePossibleMoves(curPiece);
@@ -58,6 +61,43 @@ let currentPromotion = {
 	active: false
 }
 let hasGameEnded = false;
+
+function copyPosition(curPosition) {
+	let newPosition = {
+		board: [
+			[-4, -2, -3, -5, -6, -3, -2, -4],
+			[-1, -1, -1, -1, -1, -1, -1, -1],
+			[0, 0, 0, 0, 0, 0, 0, 0],
+			[0, 0, 0, 0, 0, 0, 0, 0],
+			[0, 0, 0, 0, 0, 0, 0, 0],
+			[0, 0, 0, 0, 0, 0, 0, 0],
+			[1, 1, 1, 1, 1, 1, 1, 1],
+			[4, 2, 3, 5, 6, 3, 2, 4]
+		],
+		move: 0,
+		shortCastleWhite: true,
+		longCastleWhite: true,
+		shortCastleBlack: true,
+		longCastleBlack: true,
+		moves50: 0,
+		moves: [],
+		enPassant: -1
+	};
+	for (let i=0; i<8; i++) {
+		for (let j=0; j<8; j++) {
+			newPosition.board[i][j] = curPosition.board[i][j];
+		}
+	}
+	newPosition.move = curPosition.move;
+	newPosition.shortCastleWhite = curPosition.shortCastleWhite;
+	newPosition.longCastleWhite = curPosition.longCastleWhite;
+	newPosition.shortCastleBlack = curPosition.shortCastleBlack;
+	newPosition.longCastleBlack = curPosition.longCastleBlack;
+	newPosition.moves50 = curPosition.moves50;
+	newPosition.positionsBefore = Object.assign({}, curPosition.positionsBefore);
+	newPosition.enPassant = curPosition.enPassant;
+	return newPosition;
+}
 
 function moveElementTo(obj, x, y, promoteTo=-1) {
 	let index = obj.index();
@@ -105,6 +145,10 @@ function moveElementTo(obj, x, y, promoteTo=-1) {
 	$(".chess-board-square.chess-board-square-last").removeClass("chess-board-square-last");
 	$(".chess-board-square").eq(piecesData[index][0]*8 + piecesData[index][1]).addClass("chess-board-square-last");
 	$(".chess-board-square").eq(y*8 + x).addClass("chess-board-square-last");
+	currentPosition.moves50 += 1;
+	if (Math.abs(currentPosition.board[piecesData[index][0]][piecesData[index][1]] == 1)) {
+		currentPosition.moves50 = 0;
+	}
 	if (currentPosition.board[piecesData[index][0]][piecesData[index][1]] == 1) {
 		if (currentPosition.enPassant == x && y == 2 && currentPosition.board[y][x] == 0)
 			removePiece(x, y+1);
@@ -140,6 +184,9 @@ function moveElementTo(obj, x, y, promoteTo=-1) {
 			$(".chess-board-piece.chess-board-piece:nth-child(5)").addClass("chess-board-piece-checked");
 		}
 	}
+	let shortPos = shortPosString(currentPosition);
+	if (!(shortPos in currentPosition.positionsBefore)) currentPosition.positionsBefore[shortPos] = 0;
+	currentPosition.positionsBefore[shortPos] += 1;
 	if (getAllLegalMoves(currentPosition, (currentPosition.move == 0)).length == 0) {
 		if (isKingChecked(currentPosition, (currentPosition.move == 0))) {
 			$(".chess-text").text(`Checkmate! ${(currentPosition.move != 0) ? "White" : "Black"} Won`);
@@ -147,6 +194,18 @@ function moveElementTo(obj, x, y, promoteTo=-1) {
 			$(".chess-text").text("Stalemate! Draw");
 			$(".chess").addClass("chess-gray");
 		}
+		hasGameEnded = true;
+	} else if (currentPosition.moves50 >= 100) {
+		$(".chess-text").text("50-Move Rule! Draw");
+		$(".chess").addClass("chess-gray");
+		hasGameEnded = true;
+	} else if (isDrawByMaterial(currentPosition)) {
+		$(".chess-text").text("Insufficient Material! Draw");
+		$(".chess").addClass("chess-gray");
+		hasGameEnded = true;
+	} else if (currentPosition.positionsBefore[shortPos] >= 3) {
+		$(".chess-text").text("Threefold Repetition! Draw");
+		$(".chess").addClass("chess-gray");
 		hasGameEnded = true;
 	} else {
 		if (isWhiteMove()) {
@@ -159,6 +218,22 @@ function moveElementTo(obj, x, y, promoteTo=-1) {
 	}
 }
 
+function shortPosString(position) {
+	let posStr = "";
+	if (position.enPassant != -1) posStr += position.enPassant;
+	else posStr += "-";
+	posStr += (position.shortCastleWhite ? "1" : "0");
+	posStr += (position.longCastleWhite ? "1" : "0");
+	posStr += (position.shortCastleBlack ? "1" : "0");
+	posStr += (position.longCastleBlack ? "1" : "0");
+	for (let i=0; i<8; i++) {
+		for (let j=0; j<8; j++) {
+			posStr += pieceStr[position.board[i][j]+6];
+		}
+	}
+	return posStr;
+}
+
 function removePiece(x, y) {
 	let piece = boardPieces.eq(boardData[y][x]);
 	if (boardData[y][x] == 0 || boardData[y][x] == 4) currentPosition.longCastleBlack = false;
@@ -166,6 +241,7 @@ function removePiece(x, y) {
 	if (boardData[y][x] == 24 || boardData[y][x] == 28) currentPosition.longCastleWhite = false;
 	if (boardData[y][x] == 31 || boardData[y][x] == 28) currentPosition.shortCastleWhite = false;
 	piece.addClass("chess-board-piece-taken");
+	currentPosition.moves50 = 0;
 }
 
 function setPiecePosition(obj, x, y) {
@@ -200,6 +276,24 @@ let boardData = [
 	[16, 17, 18, 19, 20, 21, 22, 23],
 	[24, 25, 26, 27, 28, 29, 30, 31]
 ];
+
+function isDrawByMaterial(position) {
+	let material = [0, 0, 0, 0];
+	for (let i=0; i<8; i++) {
+		for (let j=0; j<8; j++) {
+			if (position.board[i][j] == 0 || Math.abs(position.board[i][j]) == 6) continue;
+			if (position.board[i][j] == 2) material[0] += 1;
+			else if (position.board[i][j] == 3) material[1] += 1;
+			else if (position.board[i][j] == -2) material[2] += 1;
+			else if (position.board[i][j] == -3) material[3] += 1;
+			else return false;
+		}
+	}
+	if (material[0] + material[1] <= 1 && material[2] + material[3] <= 1) return true;
+	if (material[0] == 2 && material[1] + material[2] + material[3] == 0) return true;
+	if (material[2] == 2 && material[1] + material[0] + material[3] == 0) return true;
+	return false;
+}
 
 function isKingChecked(position, isWhite) {
 	let toReturn = false;
@@ -615,6 +709,7 @@ $(".chess-board-piece").draggable({
 	containment: "parent",
 	delay: 0,
 	start: function(event) {
+		if (hasGameEnded) return false;
 		if (isElementWhite($(this)) == isWhiteMove() && !currentPromotion.active) {
 			showPossibleMoves($(this));
 			curPiece = $(this);
@@ -622,6 +717,7 @@ $(".chess-board-piece").draggable({
 	},
 	revert: function(event) {
 		if (!event) return true;
+		if (hasGameEnded) return true;
 		if ($(event).hasClass("chess-board-square-droppable")) {
 			hidePossibleMoves(curPiece);
 			let index = event.index();
@@ -635,7 +731,7 @@ $(".chess-board-piece").draggable({
 	scope: "chess",
 	stack: ".chess-board-piece"
 });
-$(".chess-rotate-board").click(function(event) {
+$(".chess-rotate-board").on('click', function(event) {
 	if (chessBoard.hasClass("chess-board-rotated")) {
 		chessBoard.removeClass("chess-board-rotated");
 		$(".chess-board-piece").each(function(index) {
@@ -648,7 +744,7 @@ $(".chess-rotate-board").click(function(event) {
 		});
 	}
 });
-$(".chess-board-piece").click(function(event) {
+$(".chess-board-piece").on('click', function(event) {
 	if (currentPromotion.active || hasGameEnded) return;
 	if (isElementWhite($(this)) == isWhiteMove()) {
 		if (curPiece != null && curPiece.index() == $(this).index()) {
@@ -670,7 +766,7 @@ $(".chess-board-piece").click(function(event) {
 $(".chess-board-square").droppable({
 	scope: "chess"
 });
-$(".chess-board-square").click(function(event) {
+$(".chess-board-square").on('click', function(event) {
 	if (currentPromotion.active || hasGameEnded) return;
 	if (!curPiece) return;
 	if (!$(this).hasClass("chess-board-square-droppable")) {
@@ -683,12 +779,14 @@ $(".chess-board-square").click(function(event) {
 	moveElementTo($(curPiece), index%8, Math.floor(index/8));
 	curPiece = null;
 });
-$(".chess-board-promotion div:not(:last-child)").click(function(event) {
+$(".chess-board-promotion div:not(:last-child)").on('click', function(event) {
+	if (hasGameEnded) return;
 	moveElementTo($(".chess-board-piece").eq(currentPromotion.index), currentPromotion.toX, (currentPromotion.side == 1 ? 7 : 0), $(this).index());
 	currentPromotion.active = false;
 	$(this).parent().removeClass("chess-on-promotion");
 });
-$(".chess-board-promotion-cancel").click(function(event) {
+$(".chess-board-promotion-cancel").on('click', function(event) {
+	if (hasGameEnded) return;
 	currentPromotion.active = false;
 	$(this).parent().removeClass("chess-on-promotion");
 });
