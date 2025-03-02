@@ -692,9 +692,9 @@ let piecesData = [
 }*/
 
 $(document).ready(function(){
-	scale = ($(".chess").width() + 8) / 400;
+	scale = ($(".chess").width() + 4) / 400;
 	$(".chess-info").css({"font-size": `calc(24px * ${scale})`});
-	$(".chess-rotate-board").css({"width": `calc(30px * ${scale})`, "height": `calc(30px * ${scale})`});
+	$(".chess-buttons").css({"font-size": `calc(16px * ${scale})`});
 	$(".chess-board").css({"width": `calc(400px * ${scale})`, "height": `calc(400px * ${scale})`});
 	squareWidth = $(".chess-board-square:first-child").css("width");
 	$(".chess-board-promotion").css({"width": squareWidth, "height": `calc(${squareWidth}*5)`});
